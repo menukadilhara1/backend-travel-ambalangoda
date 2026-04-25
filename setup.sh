@@ -43,10 +43,14 @@ echo "▶ Copying custom backend files..."
 REPO_RAW="https://raw.githubusercontent.com/menukadilhara1/backend-travel-ambalangoda/main/src"
 
 curl -sL -o app/Http/Controllers/AuthController.php  $REPO_RAW/AuthController.php
+curl -sL -o app/Http/Controllers/PlaceController.php $REPO_RAW/PlaceController.php
 curl -sL -o routes/api.php                           $REPO_RAW/api.php
 curl -sL -o config/cors.php                          $REPO_RAW/cors.php
 curl -sL -o app/Models/User.php                      $REPO_RAW/User.php
+curl -sL -o app/Models/Place.php                     $REPO_RAW/Place.php
 curl -sL -o bootstrap/app.php                        $REPO_RAW/bootstrap_app.php
+curl -sL -o database/migrations/2026_04_26_000000_create_places_table.php $REPO_RAW/create_places_table.php
+curl -sL -o database/seeders/PlaceSeeder.php         $REPO_RAW/PlaceSeeder.php
 echo "  ✓ Custom files copied"
 
 # ── 4. Configure .env ─────────────────────────────────────
@@ -76,10 +80,12 @@ sudo mysql -u root -e "
 echo "  ✓ Database ready"
 
 # ── 6. Run migrations ─────────────────────────────────────
-echo "▶ Running migrations..."
+echo "▶ Running migrations and seeding database..."
 php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider" --quiet
-php artisan migrate --force --quiet
-echo "  ✓ Migrations done"
+php artisan migrate:fresh --force --quiet
+sed -i "s/class DatabaseSeeder extends Seeder/class DatabaseSeeder extends Seeder { public function run(): void { \$this->call(\\\Database\\\Seeders\\\PlaceSeeder::class); } } \/\/ /" database/seeders/DatabaseSeeder.php || true
+php artisan db:seed --class=PlaceSeeder --force --quiet
+echo "  ✓ Migrations and Seeding done"
 
 # ── 7. Kill any old server + start fresh ──────────────────
 echo "▶ Starting API server on port $PORT..."
