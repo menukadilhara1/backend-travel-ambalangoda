@@ -83,8 +83,19 @@ echo "  ✓ Database ready"
 echo "▶ Running migrations and seeding database..."
 php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider" --quiet
 php artisan migrate:fresh --force --quiet
-sed -i "s/class DatabaseSeeder extends Seeder/class DatabaseSeeder extends Seeder { public function run(): void { \$this->call(\\\Database\\\Seeders\\\PlaceSeeder::class); } } \/\/ /" database/seeders/DatabaseSeeder.php || true
-php artisan db:seed --class=PlaceSeeder --force --quiet
+
+cat << 'EOF' > database/seeders/DatabaseSeeder.php
+<?php
+namespace Database\Seeders;
+use Illuminate\Database\Seeder;
+class DatabaseSeeder extends Seeder {
+    public function run(): void {
+        $this->call(PlaceSeeder::class);
+    }
+}
+EOF
+
+php artisan db:seed --force --quiet
 echo "  ✓ Migrations and Seeding done"
 
 # ── 7. Kill any old server + start fresh ──────────────────
