@@ -82,6 +82,10 @@ echo "  ✓ Database ready"
 # ── 6. Run migrations ─────────────────────────────────────
 echo "▶ Running migrations and seeding database..."
 
+# Laravel publish creates duplicate timestamped migration files if run multiple times, causing migrate:fresh to crash.
+# We cleanly delete any old Sanctum migrations and re-publish ONLY one before migrating!
+rm -f database/migrations/*personal_access_tokens*.php 2>/dev/null || true
+
 cat << 'EOF' > database/seeders/DatabaseSeeder.php
 <?php
 namespace Database\Seeders;
