@@ -81,8 +81,6 @@ echo "  ✓ Database ready"
 
 # ── 6. Run migrations ─────────────────────────────────────
 echo "▶ Running migrations and seeding database..."
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider" --quiet
-php artisan migrate:fresh --force --quiet
 
 cat << 'EOF' > database/seeders/DatabaseSeeder.php
 <?php
@@ -95,6 +93,8 @@ class DatabaseSeeder extends Seeder {
 }
 EOF
 
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider" --quiet
+php artisan migrate:fresh --force --quiet
 php artisan db:seed --force --quiet
 echo "  ✓ Migrations and Seeding done"
 
